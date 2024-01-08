@@ -4,8 +4,6 @@ name: Build and test
 on:
   pull_request:
   push:
-    branches:
-      - 'master'
 
 concurrency:
     # https://docs.github.com/en/actions/using-jobs/using-concurrency
