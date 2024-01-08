@@ -76,9 +76,8 @@ abstract class DiktatTaskBase(
             inputs.include("src/**/*.kt")
         }
         project.objects.fileCollection().from(
-            project.fileTree("${project.projectDir}").apply {
-                exclude("${project.buildDir}")
-            }
+            project.fileTree("${project.projectDir}")
+                .apply { exclude("${project.buildDir}") }
                 .matching(inputs)
         )
     }
@@ -128,6 +127,7 @@ abstract class DiktatTaskBase(
                 project.logger.info("Analyzing {} files with diktat in project {}", files.size, project.name)
                 project.logger.debug("Analyzing {}", files)
             }
+
             override fun before(file: Path) {
                 project.logger.debug("Checking file {}", file)
             }

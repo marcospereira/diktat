@@ -28,6 +28,24 @@ class DiktatGradlePluginFunctionalTest {
     }
 
     @Test
+    fun `should execute diktatCheck with configuration cache`() {
+        val firstResult = runDiktat(testProjectDir, shouldSucceed = false, arguments = listOf("--configuration-cache"))
+
+        val diktatCheckBuildResult = firstResult.task(":$DIKTAT_CHECK_TASK")
+        requireNotNull(diktatCheckBuildResult)
+        Assertions.assertEquals(TaskOutcome.FAILED, diktatCheckBuildResult.outcome)
+        Assertions.assertTrue(
+            firstResult.output.contains("[FILE_NAME_MATCH_CLASS]")
+        )
+
+        val reusingConfigurationCacheResult = runDiktat(testProjectDir, shouldSucceed = false, arguments = listOf("--configuration-cache"))
+        Assertions.assertTrue(
+            reusingConfigurationCacheResult.output.contains("Reusing configuration cache")
+        )
+    }
+
+
+    @Test
     fun `should execute diktatCheck on default values`() {
         val result = runDiktat(testProjectDir, shouldSucceed = false)
 
