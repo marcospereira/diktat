@@ -15,25 +15,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: 11
-          distribution: temurin
-
-      - uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          arguments: |
-            diktatCheck
-            mergeDiktatReports
-            -Pdiktat.githubActions=true
-            -Pdetekt.multiplatform.disabled=true
-            --continue
-            --build-cache
-            -PgprUser=${{ github.actor }}
+      - name: Setup JDK 11 & Gradle
+        uses: .github/java-and-gradle-setup
+      - name: Run diktatCheck mergeDiktatReports
+        run: |
+          ./gradlew \
+            diktatCheck \
+            mergeDiktatReports \
+            -Pdiktat.githubActions=true \
+            -Pdetekt.multiplatform.disabled=true \
+            --continue \
+            --build-cache \
+            -PgprUser=${{ github.actor }} \
             -PgprKey=${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload SARIF report to Github
         uses: github/codeql-action/upload-sarif@v3
         if: ${{ always() }}

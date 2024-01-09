@@ -27,11 +27,8 @@ jobs:
           # https://github.com/actions/checkout/issues/206#issuecomment-607496604.
           fetch-depth: 0
 
-      - name: 'Set up Java'
-        uses: actions/setup-java@v4
-        with:
-          java-version: 11
-          distribution: temurin
+      - name: Setup JDK 11 & Gradle
+        uses: .github/java-and-gradle-setup
 
       - name: 'Calculate the release version'
         run: |
@@ -39,31 +36,19 @@ jobs:
 
       - name: 'Publish a release to Maven Central'
         id: publish-sonatype
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          arguments: |
-            publishToSonatype
-            closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: 'Publish a release to Gradle Plugins'
         id: publish-gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          arguments: |
-            :diktat-gradle-plugin:publishPlugins
-            -Pgradle.publish.key=${{ secrets.GRADLE_KEY }}
+        run: |
+          ./gradlew \
+            :diktat-gradle-plugin:publishPlugins \
+            -Pgradle.publish.key=${{ secrets.GRADLE_KEY }} \
             -Pgradle.publish.secret=${{ secrets.GRADLE_SECRET }}
 
       - name: 'Publish a release to GitHub'
         id: publish-github
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          arguments: |
-            shadowExecutableJar
-            publishAllPublicationsToGitHubRepository
+        run: ./gradlew shadowExecutableJar publishAllPublicationsToGitHubRepository
       - name: 'GitHub Release'
         id: create_release
         uses: actions/create-release@v1

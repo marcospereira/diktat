@@ -1,0 +1,31 @@
+name: 'Java & Gradle Setup Action'
+description: 'Reusable GitHub Action to set up Java and Gradle'
+
+inputs:
+  gradle-cache-disabled:
+    description: 'If it should disable Gradle cache (default false)'
+    required: false
+    default: 'false'
+  gradle-version:
+    description: 'Which Gradle version the action uses'
+    required: false
+    default: 'wrapper'
+  java-version:
+    description: 'Which Java version will be installed'
+    required: false
+    default: "11"
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up JDK ${{ inputs.java-version }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: "temurin"
+    - name: Set up Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        cache-disabled: ${{ inputs.gradle-cache-disabled }}
+        gradle-version: ${{ inputs.gradle-cache-read-only }}
+        cache-write-only: ${{ inputs.gradle-cache-write-only }}
